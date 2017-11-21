@@ -303,6 +303,7 @@ memory_err:
 	}
 
 	time_t start_p = (time_t) -1, end_p = (time_t) -1;
+	int start_set = 0, end_set = 0;
 	struct timeval t_start, t_end;
 
 	int opt = 0;
@@ -471,6 +472,7 @@ memory_err:
 						snprintf(wps->error, 256, "\n [!] Bad starting point -- %s\n\n", optarg);
 						goto usage_err;
 					}
+					start_set = 1;
 					break;
 				}
 				goto usage_err;
@@ -480,6 +482,7 @@ memory_err:
 						snprintf(wps->error, 256, "\n [!] Bad ending point -- %s\n\n", optarg);
 						goto usage_err;
 					}
+					end_set = 1;
 					break;
 				}
 				goto usage_err;
@@ -731,7 +734,7 @@ usage_err:
 	}
 
 	/* Cannot specify --start or --end if --force is selected */
-	if (wps->bruteforce && ((start_p != (time_t) -1) || (end_p != (time_t) -1))) {
+	if (wps->bruteforce && (start_set || end_set)) {
 		snprintf(wps->error, 256, "\n [!] Cannot specify --start or --end if --force is selected!\n\n");
 		goto usage_err;
 	}
@@ -771,8 +774,8 @@ usage_err:
 		wps->end = t_start.tv_sec - MODE3_DAYS * SEC_PER_DAY;
 
 		/* Attributes --start and --end can be switched start > end or end > start */
-		if (start_p != (time_t) -1) {
-			if (end_p != (time_t) -1) {
+		if (start_set) {
+			if (end_set) {
 
 				/* Attributes --start and --end must be different */
 				if (start_p == end_p) {
@@ -795,7 +798,7 @@ usage_err:
 				}
 			}
 		} else {
-			if (end_p != (time_t) -1) {
+			if (end_set) {
 				if (end_p >= wps->start) {
 					snprintf(wps->error, 256, "\n [!] Bad Ending point!\n\n");
 					goto usage_err;

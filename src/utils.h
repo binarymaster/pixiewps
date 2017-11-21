@@ -214,7 +214,14 @@ unsigned int get_unix_datetime(char *s, time_t *datetime) {
 	*datetime = c_timegm(&t);
 
 	if (*datetime < 0)
+	{
+		if (year == 2038 && month == 2)
+		{
+			*datetime = (time_t) 0x7FFFFFFF;
+			return 0;
+		}
 		return 1;
+	}
 
 	return 0;
 }
